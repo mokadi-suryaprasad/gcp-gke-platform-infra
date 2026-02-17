@@ -1,5 +1,5 @@
 locals {
-  resource_name = "vpc-network"
+  resource_name = "test-app"
 
   module_versions = {
     network   = "v15.0.0"
@@ -26,7 +26,7 @@ locals {
 # VPC NETWORK
 # ---------------------------------------------------
 module "vpc_network" {
-  source = "${local.module_source}//modules/vpc?ref=${local.module_version}"
+  source = local.module_sources.vpc
 
   project_id              = var.project_id
   network_name            = "${local.resource_name}-main"
@@ -39,8 +39,7 @@ module "vpc_network" {
 # SUBNETS
 # ---------------------------------------------------
 module "vpc_subnets" {
-  source = "${local.module_source}//modules/subnets?ref=${local.module_version}"
-
+  source = local.module_sources.subnets
   project_id   = var.project_id
   network_name = module.vpc_network.network_name
   subnets      = var.subnets
@@ -52,7 +51,7 @@ module "vpc_subnets" {
 # ---------------------------------------------------
 
 module "cloud_nat" {
-  source = local.cloud_nat_module_source
+  source = local.module_sources.cloud_nat
 
   project_id = var.project_id
   region     = var.region
@@ -86,7 +85,7 @@ module "cloud_nat" {
 # FIREWALL RULES
 # ---------------------------------------------------
 module "vpc_firewall" {
-  source = "${local.module_source}//modules/firewall-rules?ref=${local.module_version}"
+  source = local.module_sources.firewall
 
   project_id   = var.project_id
   network_name = module.vpc_network.network_name
@@ -99,7 +98,7 @@ module "vpc_firewall" {
 # GKE CLUSTER (FABRIC)
 # ---------------------------------------------------
 module "cluster_1" {
-  source     = local.gke_standard_module_source
+  source     = local.module_sources.gke_cluster
   project_id = var.project_id
   name       = "${local.resource_name}-gke-cluster"
   location   = var.cluster_location
@@ -138,9 +137,8 @@ access_config = {
 # GKE NODE POOL (FABRIC)
 # ---------------------------------------------------
 module "node_pool_default" {
-  source     = local.gke_node_pools_module_source
+  source     = local.module_sources.gke_nodepool
   project_id = var.project_id
-
   cluster_name = module.cluster_1.name
   location     = module.cluster_1.location
   name         = "${local.resource_name}-default-node-pool"
