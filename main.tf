@@ -25,7 +25,6 @@ locals {
 # ---------------------------------------------------
 module "vpc_network" {
   source = local.module_sources.vpc
-
   project_id              = var.project_id
   network_name            = "${local.resource_name}-main"
   auto_create_subnetworks = var.auto_create_subnetworks
@@ -50,19 +49,14 @@ module "vpc_subnets" {
 
 module "cloud_nat" {
   source = local.module_sources.cloud_nat
-
   project_id = var.project_id
   region     = var.region
-
   # Let module create router automatically
   create_router = true
   router        = "${local.resource_name}-router"
   network       = module.vpc_network.network_self_link
-
   name = "${local.resource_name}-nat"
-
   source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
-
   subnetworks = [
     for s in values(module.vpc_subnets.subnets) : {
       name                    = s.self_link
@@ -84,10 +78,8 @@ module "cloud_nat" {
 # ---------------------------------------------------
 module "vpc_firewall" {
   source = local.module_sources.firewall
-
   project_id   = var.project_id
   network_name = module.vpc_network.network_name
-
   ingress_rules = var.ingress_rules
   egress_rules  = var.egress_rules
 }
@@ -119,7 +111,6 @@ access_config = {
   vpc_config = {
     network    = module.vpc_network.network_self_link
     subnetwork = values(module.vpc_subnets.subnets)[0].self_link
-
     secondary_range_names = {
       pods     = "pods"
       services = "services"
