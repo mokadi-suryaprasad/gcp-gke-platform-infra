@@ -13,9 +13,7 @@ locals {
     vpc      = "${local.network_repo}//modules/vpc?ref=${local.module_versions.network}"
     subnets  = "${local.network_repo}//modules/subnets?ref=${local.module_versions.network}"
     firewall = "${local.network_repo}//modules/firewall-rules?ref=${local.module_versions.network}"
-
     cloud_nat = "git::https://github.com/terraform-google-modules/terraform-google-cloud-nat.git?ref=${local.module_versions.cloud_nat}"
-
     gke_cluster  = "git::https://github.com/GoogleCloudPlatform/cloud-foundation-fabric.git//modules/gke-cluster-standard?ref=${local.module_versions.fabric}"
     gke_nodepool = "git::https://github.com/GoogleCloudPlatform/cloud-foundation-fabric.git//modules/gke-nodepool?ref=${local.module_versions.fabric}"
   }
